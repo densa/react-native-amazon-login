@@ -1,3 +1,6 @@
 rootProject.name = 'example'
 
 include ':app'
+
+include ':react-native-amazon-login'
+project(':react-native-amazon-login').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-amazon-login/android')
