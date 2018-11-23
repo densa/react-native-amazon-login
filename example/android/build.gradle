@@ -1,5 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     ext {
         buildToolsVersion = "27.0.3"
@@ -19,7 +18,6 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-
 allprojects {
     repositories {
         mavenLocal()
@@ -29,9 +27,22 @@ allprojects {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
         }
+        flatDir {
+            dirs 'libs'
+        }
     }
 }
 
+subprojects {
+    afterEvaluate {project ->
+        if (project.hasProperty("android")) {
+            android {
+                compileSdkVersion 27
+                buildToolsVersion '27.0.3'
+            }
+        }
+    }
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
