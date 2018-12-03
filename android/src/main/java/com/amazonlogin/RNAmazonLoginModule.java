@@ -85,46 +85,43 @@ public class RNAmazonLoginModule extends ReactContextBaseJavaModule implements L
   }
 
   @Override
-  public void initialize() {
-    requestContext = RequestContext.create(getCurrentActivity());
-    requestContext.registerListener(new AuthorizeListener() {
-      /* Authorization was completed successfully. */
-      @Override
-      public void onSuccess(AuthorizeResult authorizeResult) {
-        final WritableMap userMap = Arguments.createMap();
-        User user = authorizeResult.getUser();
-        userMap.putString("id", user.getUserId());
-        userMap.putString("name", user.getUserName());
-        userMap.putString("email", user.getUserEmail());
-        userMap.putString("postalCode", user.getUserPostalCode());
-
-        final WritableMap result = Arguments.createMap();
-        result.putString("token", authorizeResult.getAccessToken());
-        result.putMap("user", userMap);
-        mAuthPromise.resolve(result);
-        mAuthPromise = null;
-      }
-
-      /* There was an error during the attempt to authorize the application */
-      @Override
-      public void onError(AuthError authError) {
-          mAuthPromise.reject(TAG, authError.getMessage());
-          mAuthPromise = null;
-      }
-
-      /* Authorization was cancelled before it could be completed. */
-      @Override
-      public void onCancel(AuthCancellation authCancellation) {
-          mAuthPromise.reject(TAG, "User cancelled authorization");
-          mAuthPromise = null;
-      }
-    });
-  }
-
-  @Override
   public void onHostResume() {
     if (requestContext != null) {
       requestContext.onResume();
+    } else {
+      requestContext = RequestContext.create(getCurrentActivity());
+      requestContext.registerListener(new AuthorizeListener() {
+        /* Authorization was completed successfully. */
+        @Override
+        public void onSuccess(AuthorizeResult authorizeResult) {
+          final WritableMap userMap = Arguments.createMap();
+          User user = authorizeResult.getUser();
+          userMap.putString("id", user.getUserId());
+          userMap.putString("name", user.getUserName());
+          userMap.putString("email", user.getUserEmail());
+          userMap.putString("postalCode", user.getUserPostalCode());
+
+          final WritableMap result = Arguments.createMap();
+          result.putString("token", authorizeResult.getAccessToken());
+          result.putMap("user", userMap);
+          mAuthPromise.resolve(result);
+          mAuthPromise = null;
+        }
+
+        /* There was an error during the attempt to authorize the application */
+        @Override
+        public void onError(AuthError authError) {
+            mAuthPromise.reject(TAG, authError.getMessage());
+            mAuthPromise = null;
+        }
+
+        /* Authorization was cancelled before it could be completed. */
+        @Override
+        public void onCancel(AuthCancellation authCancellation) {
+            mAuthPromise.reject(TAG, "User cancelled authorization");
+            mAuthPromise = null;
+        }
+      });
     }
   }
 
@@ -134,6 +131,7 @@ public class RNAmazonLoginModule extends ReactContextBaseJavaModule implements L
 
   @Override
   public void onHostDestroy() {
+    requestContext = null;
   }
 
 }
